@@ -1,5 +1,6 @@
 stages:
   - build
+  - deploy_gcp
 
 build_images:
   stage: build
@@ -17,3 +18,12 @@ build_images:
   script:
     - docker build -t guilhermemarques1/app-cicd-dio:1.0 app/.
     - docker push guilhermemarques1/app-cicd-dio:1.0
+
+deploy_gcp:
+  stage: deploy_gcp
+
+  before_script:
+    - chmod 400 $SSH_KEY
+
+  script:
+    - ssh -o StrictHostKeyChecking=no -i $SSH_KEY gcp@$SSH_SERVER "sudo rm -rf ./app-cicd-dio/ && sudo git clone git@gitlab.com:GuilhermeMarques1/app-cicd-dio.git && cd app-cicd-dio && sudo chmod +x ./script.sh && sudo ./script.sh"
